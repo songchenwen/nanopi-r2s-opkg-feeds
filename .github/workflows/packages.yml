@@ -1,0 +1,146 @@
+name: packages
+
+
+on:
+  repository_dispatch:
+  push:
+    branches: 
+      - src
+    paths:
+      - '.github/workflows/packages.yml'
+      - 'packages.seed'
+      - '*.sh'
+  pull_request:
+    branches:
+      - src
+  schedule:
+    - cron: '0 17 * * 1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Setup timezone
+        uses: zcong1993/setup-timezone@master
+        with:
+          timezone: Asia/Shanghai
+          
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          ref: src
+          fetch-depth: 0
+
+      - name: Save Private Key
+        if: github.event_name == 'push'
+        run: |
+          echo 'untrusted comment: private key 5e99c2573f29d764' > private.key
+          echo "${{ secrets.private_key }}" >> private.key
+
+      - name: Init Env
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          . init_env.sh
+      
+      - name: Friendlywrt Source
+        run: |
+          . friendlywrt_source.sh
+
+      - name: Change Feeds to Lean
+        run: |
+          cd friendlywrt-rk3328
+          git clone https://github.com/coolsnowwolf/lede
+          cd friendlywrt
+          cp -r ../lede/package/lean package/
+          sed -i 's/^src-git luci.*/src-git luci https:\/\/github.com\/coolsnowwolf\/luci/' feeds.conf.default
+          sed -i 's/^src-git packages.*/src-git packages https:\/\/github.com\/coolsnowwolf\/packages/' feeds.conf.default
+        
+      - name: Add Packages to Lean
+        run: |
+          . add_packages_to_lean.sh
+
+      - name: Install Openwrt Libs
+        run: |
+          git config --global user.email "action@github.com" && git config --global user.name "GitHub Action"
+          cd friendlywrt-rk3328
+          git clone https://github.com/openwrt/openwrt
+          cd openwrt
+          git revert --no-edit d27623b542548b765ddd46b046169006a3b5f66f
+          cd ..
+          rm -rf friendlywrt/package/libs
+          cp -r openwrt/package/libs friendlywrt/package/
+
+      - name: Update Feeds
+        run: |
+          cd friendlywrt-rk3328/friendlywrt
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Install UPX
+        run: |
+          mkdir -p friendlywrt-rk3328/friendlywrt/staging_dir/host/bin/
+          ln -s /usr/bin/upx-ucl friendlywrt-rk3328/friendlywrt/staging_dir/host/bin/upx
+  
+      - name: Update Target.mk
+        run: |
+          cd friendlywrt-rk3328/friendlywrt/include
+          sed -i 's/dnsmasq /dnsmasq-full default-settings luci /' target.mk
+
+      - name: Build Config
+        run: |
+          cd friendlywrt-rk3328
+          cat configs/config_rk3328 | grep "TARGET" > ../rk3328.config
+          cat ../packages.seed >> ../rk3328.config
+          cat ../rk3328.config > configs/config_rk3328
+          cat configs/config_rk3328
+      
+      - name: Clean src
+        run: |
+          cd friendlywrt-rk3328
+          rm -rf lede
+          rm -rf openwrt
+
+      - name: Build Friendlywrt
+        env:
+          IGNORE_ERRORS: 1
+        run: |
+          cd friendlywrt-rk3328
+          sed -i 's/set -eu/set -u/' scripts/mk-friendlywrt.sh
+          ./build.sh nanopi_r2s.mk
+    
+      - name: Collect Packages
+        if: github.event_name == 'push'
+        run: |
+          cd friendlywrt-rk3328
+          mkdir -p packagerepo/packages
+          mv friendlywrt/bin/packages/aarch64_cortex-a53/*/*.ipk packagerepo/packages/
+          mv friendlywrt/bin/targets/rockchip-rk3328/generic/packages/*.ipk packagerepo/packages/
+          cat -s friendlywrt/bin/packages/aarch64_cortex-a53/*/Packages > packagerepo/packages/Packages
+          cat -s friendlywrt/bin/targets/rockchip-rk3328/generic/packages/Packages >> packagerepo/packages/Packages
+          cat -s friendlywrt/bin/packages/aarch64_cortex-a53/*/Packages.manifest > packagerepo/packages/Packages.manifest
+          cat -s friendlywrt/bin/targets/rockchip-rk3328/generic/packages/Packages.manifest >> packagerepo/packages/Packages.manifest
+          cd packagerepo/packages/
+          gzip -k Packages
+      
+      - name: Sign Packages
+        if: github.event_name == 'push'
+        run: |
+          cd friendlywrt-rk3328
+          sudo cp friendlywrt/staging_dir/host/bin/usign /usr/bin/usign
+          cd packagerepo/packages
+          usign -S -m Packages -s ../../../private.key -x Packages.sig
+
+      - name: Push Changes
+        if: github.event_name == 'push'
+        run: |
+          cd friendlywrt-rk3328/packagerepo
+          mkdir keys
+          cp ../../keys/* keys/
+          cp ../../README.md ./
+          cp ../../README.md ./packages/
+          git init
+          git add .
+          git commit -m "Depoly at $(date +%Y-%m-%d)"
+          git push -f "https://${{ secrets.sec_token }}@github.com/songchenwen/nanopi-r2s-opkg-feeds.git" master:master
