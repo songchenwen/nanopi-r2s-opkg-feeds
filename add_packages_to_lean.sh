@@ -12,6 +12,12 @@ git clone --depth 1 https://github.com/rufengsuixing/luci-app-adguardhome.git
 pwd
 git clone --depth 1 https://github.com/tty228/luci-app-serverchan.git
 
+git clone --depth 1 https://github.com/vernesong/OpenClash.git
+mv OpenClash/luci-app-openclash/ ./
+rm -rf OpenClash/
+
+git clone --depth 1 https://github.com/fw876/helloworld.git
+
 git clone --depth 1 https://github.com/songchenwen/nanopi-r2s.git
 cp -r nanopi-r2s/luci-app-r2sflasher ./
 rm -rf nanopi-r2s
