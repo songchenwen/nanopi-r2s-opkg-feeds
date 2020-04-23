@@ -24,6 +24,10 @@ wget -qO /etc/opkg/keys/5e99c2573f29d764 "https://songchenwen.com/nanopi-r2s-opk
 
 或禁用签名检查，在 `软件包 - 配置 - 自定义软件源` 中删掉这一行 `option check_signature 1`
 
+## 已集成固件
+
+- [songchenwen/nanopi-r2s](https://github.com/songchenwen/nanopi-r2s)
+
 ----------------
 
 [欢迎 PR 和 issue](https://github.com/songchenwen/nanopi-r2s-opkg-feeds)
