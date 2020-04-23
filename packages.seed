@@ -162,6 +162,8 @@ CONFIG_UnblockNeteaseMusic_NodeJS=y
 CONFIG_PACKAGE_luci-app-zerotier=y
 CONFIG_PACKAGE_luci-app-wireguard=y
 
+# CONFIG_PACKAGE_base-files is not set
+
 CONFIG_PACKAGE_luci-app-acme=m
 CONFIG_PACKAGE_luci-app-adblock=m
 CONFIG_PACKAGE_luci-app-amule=m

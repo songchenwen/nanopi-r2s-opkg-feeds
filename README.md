@@ -1,4 +1,4 @@
-# Nanopi R2S 软件包源
+# NanoPi R2S 专用软件源
 
 ![packages](https://github.com/songchenwen/nanopi-r2s-opkg-feeds/workflows/packages/badge.svg)
 
