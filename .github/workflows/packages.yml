@@ -102,6 +102,13 @@ jobs:
           rm -rf lede
           rm -rf openwrt
 
+      - name: Add usign
+        run: |
+          mkdir -p friendlywrt-rk3328/friendlywrt/staging_dir/host/bin/
+          sudo chmod a+x usign
+          cp usign friendlywrt-rk3328/friendlywrt/staging_dir/host/bin/
+          sudo mv usign /usr/bin/
+
       - name: Build Friendlywrt
         env:
           IGNORE_ERRORS: 1
@@ -128,7 +135,6 @@ jobs:
         if: github.event_name == 'push'
         run: |
           cd friendlywrt-rk3328
-          sudo cp friendlywrt/staging_dir/host/bin/usign /usr/bin/usign
           cd packagerepo/packages
           usign -S -m Packages -s ../../../private.key -x Packages.sig
 
