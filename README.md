@@ -22,7 +22,7 @@ ssh 进路由器 执行
 wget -qO /etc/opkg/keys/5e99c2573f29d764 "https://songchenwen.com/nanopi-r2s-opkg-feeds/keys/5e99c2573f29d764"
 ~~~
 
-或禁用签名检查，在 `软件包 - 配置 - 自定义软件源` 中删掉这一行 `option check_signature 1`
+或禁用签名检查，在 `软件包 - 配置` 中删掉这一行 `option check_signature 1`
 
 ## 已集成固件
 
