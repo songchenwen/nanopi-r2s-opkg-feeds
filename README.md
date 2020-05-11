@@ -11,7 +11,7 @@
 在 `软件包 - 配置 - 自定义软件源` 中添加如下一行 
 
 ~~~
-src/gz songchenwen https://songchenwen.com/nanopi-r2s-opkg-feeds/packages
+src/gz songchenwen https://nanopi-r2s-opkg-feeds.songchenwen.com/packages/
 ~~~
 
 ## 添加签名公钥
@@ -19,7 +19,7 @@ src/gz songchenwen https://songchenwen.com/nanopi-r2s-opkg-feeds/packages
 ssh 进路由器 执行
 
 ~~~
-mkdir -p /etc/opkg/keys; wget -qO /etc/opkg/keys/5e99c2573f29d764 "https://songchenwen.com/nanopi-r2s-opkg-feeds/keys/5e99c2573f29d764"
+mkdir -p /etc/opkg/keys; wget -qO /etc/opkg/keys/5e99c2573f29d764 "https://nanopi-r2s-opkg-feeds.songchenwen.com/keys/5e99c2573f29d764"
 ~~~
 
 或禁用签名检查，在 `软件包 - 配置` 中删掉这一行 `option check_signature 1`
