@@ -146,6 +146,7 @@ jobs:
           cp ../../keys/* keys/
           cp ../../README.md ./
           cp ../../README.md ./packages/
+          cp ../../CNAME ./
           git init
           git add .
           git commit -m "Depoly at $(date +%Y-%m-%d)"
