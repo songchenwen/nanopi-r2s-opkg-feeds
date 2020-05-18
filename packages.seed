@@ -221,6 +221,3 @@ CONFIG_PACKAGE_python3=m
 
 CONFIG_PACKAGE_screen=m
 CONFIG_PACKAGE_git=m
-CONFIG_PACKAGE_webui-aria2=m
-CONFIG_PACKAGE_luci-app-macvlan=m
-CONFIG_PACKAGE_kmod-ipt-psd=m
