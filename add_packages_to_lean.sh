@@ -27,6 +27,7 @@ ls
 cd ..
 pwd
 echo "src-git scw https://github.com/songchenwen/openwrt-package" >> feeds.conf.default
+echo "src-git xwrt https://github.com/x-wrt/com.x-wrt" >> feeds.conf.default
 
 echo "feeds.conf.default"
 cat feeds.conf.default

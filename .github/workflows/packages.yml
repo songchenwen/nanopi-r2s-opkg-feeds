@@ -66,11 +66,24 @@ jobs:
           git config --global user.email "action@github.com" && git config --global user.name "GitHub Action"
           cd friendlywrt-rk3328
           git clone https://github.com/openwrt/openwrt
-          cd openwrt
-          git revert --no-edit d27623b542548b765ddd46b046169006a3b5f66f
-          cd ..
           rm -rf friendlywrt/package/libs
           cp -r openwrt/package/libs friendlywrt/package/
+      
+      - name: Use Chuck's Kernel
+        run: |
+          cd friendlywrt-rk3328
+          rm -rf kernel
+          git clone --depth=1 https://github.com/fanck0605/friendlywrt-kernel.git kernel
+          cd openwrt
+          ./scripts/patch-kernel.sh ../kernel target/linux/generic/backport-5.4
+          ./scripts/patch-kernel.sh ../kernel target/linux/generic/pending-5.4
+          ./scripts/patch-kernel.sh ../kernel target/linux/generic/hack-5.4
+          ./scripts/patch-kernel.sh ../kernel target/linux/octeontx/patches-5.4
+          cp -a ./target/linux/generic/files/* ../kernel/
+          cd ../kernel
+          wget -O net/netfilter/xt_FULLCONENAT.c https://raw.githubusercontent.com/Chion82/netfilter-full-cone-nat/master/xt_FULLCONENAT.c
+          wget -O ../fullcone_nat.patch https://github.com/fanck0605/nanopi-r2s/raw/lean/patches/001-kernel-add-full_cone_nat.patch
+          git apply ../fullcone_nat.patch
 
       - name: Update Feeds
         run: |
@@ -114,7 +127,6 @@ jobs:
           IGNORE_ERRORS: 1
         run: |
           cd friendlywrt-rk3328
-          sed -i 's/set -eu/set -u/' scripts/mk-friendlywrt.sh
           ./build.sh nanopi_r2s.mk
     
       - name: Collect Packages
