@@ -12,7 +12,7 @@ git clone --depth 1 https://github.com/rufengsuixing/luci-app-adguardhome.git
 pwd
 git clone --depth 1 https://github.com/tty228/luci-app-serverchan.git
 
-git clone --depth 1 https://github.com/vernesong/OpenClash.git
+git clone --depth 1 -b master https://github.com/vernesong/OpenClash.git
 mv OpenClash/luci-app-openclash/ ./
 rm -rf OpenClash/
 
