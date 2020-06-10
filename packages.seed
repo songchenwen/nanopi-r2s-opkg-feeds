@@ -94,6 +94,7 @@ CONFIG_PACKAGE_coreutils-timeout=y
 CONFIG_PACKAGE_luci-app-opkg=y
 CONFIG_PACKAGE_iptables-mod-extra=y
 CONFIG_PACKAGE_kmod-ipt-extra=y
+CONFIG_PACKAGE_kmod-ipt-tproxy=y
 CONFIG_PACKAGE_libltdl=y
 CONFIG_PACKAGE_losetup=y
 CONFIG_PACKAGE_zstd=y
